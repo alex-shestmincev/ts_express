@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20160701205107"
+  },
+  "globalDependencies": {
+    "body-parser": "registry:dt/body-parser#0.0.0+20160619023215",
+    "express": "registry:dt/express#4.0.0+20160708185218",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#4.0.0+20160711183608",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "mongodb": "registry:dt/mongodb#2.1.0+20160602142941",
+    "mongoose": "registry:dt/mongoose#4.5.4+20160713062330",
+    "mpromise": "registry:dt/mpromise#0.5.4+20160316155526",
+    "node": "registry:dt/node#6.0.0+20160709114037",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
+  }
+}
