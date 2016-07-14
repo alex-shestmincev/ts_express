@@ -59,10 +59,15 @@ class Server {
 
     // Error handler
     this.app.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
-      var code = err.code;
-      var message = err.message;
-      res.writeHead(code, message, {'content-type' : 'text/plain'});
-      res.end(message);
+
+      if (!err.code || err.code >= 500) {
+        console.error(err);
+        res.status(400);
+        res.json({ error: 'Uncatched error' });
+        return;
+      }
+      res.writeHead(err.code, err.message, {'content-type' : 'text/plain'});
+      res.end(err.message);
     });
   }
 }

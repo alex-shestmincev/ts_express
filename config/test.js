@@ -1,10 +1,8 @@
-const appVersion = require('../package.json').version;
-
 module.exports = {
-  version: appVersion,
+  isTest: true,
   port: process.env.PORT || 3333,
   mongoose: {
-    uri: 'mongodb://localhost/ts_express_dev',
+    uri: 'mongodb://localhost/ts_express_test',
     options: {
       server: {
         socketOptions: {

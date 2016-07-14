@@ -8,48 +8,81 @@ import * as mongoose from 'mongoose';
 import { HttpError, IError } from '../libs/errors';
 
 export class TodosCtrl {
-  static async GetById(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const id: string = req.query.id;
-    const task: ITodos = await TodosModel.findById(id).exec();
-    if (!task){
-      const error: IError = new HttpError(404, 'Task is not found');
-      return next(error);
-    }
+  static async getByIdMdlw(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id: string = req.params.id;
+      const todo: ITodos = await TodosModel.findById(id).exec();
+      if (!todo){
+        const error: IError = new HttpError(404, 'Todo is not found');
+        return next(error);
+      }
 
-    next();
+      next();
+    } catch(err) {
+      next(err);
+    }
   }
 
   static async List(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const list: Array<ITodos> = await TodosModel.find({}).exec();
+    try {
+      const list: Array<ITodos> = await TodosModel.find({}).exec();
 
-    res.json({ todos: list});
+      res.json({ todos: list});
+    } catch (err) {
+      next(err);
+    }
   }
 
   static async Create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    let newTask: ITodos = req.body.task;
+    try {
+      let newTask: ITodos = req.body.todo;
+      const created: ITodos = await TodosModel.create(newTask);
 
-    const created: ITodos = await TodosModel.create(newTask);
-    res.status(201);
-    res.json({ task: created });
+      res.status(201);
+      res.json({ todo: created });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async GetById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id: string = req.params.id;
+      const todo: ITodos = await TodosModel.findById(id).exec();
+
+      res.json({ todo });
+    } catch (err) {
+      next(err);
+    }
   }
 
   static async Update(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const id: string = req.query.id;
-    const task: ITodos = await TodosModel.findById(id).exec();
-    let upTask: ITodos = req.body.task;
+    try {
+      const id: string = req.params.id;
+      const todo: ITodos = await TodosModel.findById(id).exec();
+      let upTask: ITodos = req.body.todo;
 
-    task.status = upTask.status;
-    await task.save();
+      todo.status = upTask.status;
+      todo.title = upTask.title;
+      todo.description = upTask.description;
+      await todo.save();
 
-    res.json({ task });
+      res.json({ todo });
+    } catch (err) {
+      next(err);
+    }
   }
 
   static async Delete(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const id: string = req.query.id;
-    const task: ITodos = await TodosModel.findById(id).exec();
+    try {
+      const id: string = req.query.id;
+      const task: ITodos = await TodosModel.findById(id).exec();
 
-    await task.remove();
+      await task.remove();
 
-    res.json({ deleted: true });
+      res.json({ deleted: true });
+    } catch (err) {
+      next(err);
+    }
   }
 }
