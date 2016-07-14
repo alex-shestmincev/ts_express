@@ -42,7 +42,6 @@ class Server {
   }
 
   config() {
-    console.log('config');
     this.app.use(bodyParser.json());
 
     //mount query string parser
@@ -56,6 +55,14 @@ class Server {
       var error = new Error("Not Found");
       err.status = 404;
       next(err);
+    });
+
+    // Error handler
+    this.app.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
+      var code = err.code;
+      var message = err.message;
+      res.writeHead(code, message, {'content-type' : 'text/plain'});
+      res.end(message);
     });
   }
 }

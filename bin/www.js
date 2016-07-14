@@ -1,6 +1,8 @@
 //module dependencies.
 var app = require("../dist/app");
 var http = require("http");
+var mongoose = require('mongoose');
+var config = require('config');
 
 /**
  * Normalize a port into a number, string, or false.
@@ -67,7 +69,14 @@ app.set("port", port);
 var server = http.createServer(app);
 
 //listen on provided ports
-server.listen(port);
+mongoose.connect(config.mongoose.uri, config.mongoose.options, function(err) {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  server.listen(port);
+})
+
 
 //add error handler
 server.on("error", onError);
