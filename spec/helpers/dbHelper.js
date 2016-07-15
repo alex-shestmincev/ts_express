@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const mongoose = require('mongoose');
 const config = require('config');
 let _db = null;

@@ -1,4 +1,5 @@
 'use strict';
+process.env.NODE_ENV = 'test';
 const app = require('../dist/app');
 const request = require('supertest-as-promised').agent(app);
 const dbHelper = require('./helpers/dbHelper');
@@ -8,14 +9,24 @@ const todosHelper = require('./../dist/todos/helpers');
 
 describe("Todos", function() {
   beforeEach((done) => {
-    dbHelper.connect().then(() => done());
+    dbHelper.connect()
+      .then(() => TodosModel.remove({}))
+      .then(() => done())
   });
 
   describe("GET /", () => {
+    beforeEach((done) => {
+      TodosModel.create(testTodosHelper.newTodoItem).then((todo) => {
+        this.todo = todo;
+        done();
+      })
+    })
+
     it("should return list of todos", (done) => {
       request.get('/todos').then(res => {
         expect(res.body.todos).toBeDefined();
         expect(Array.isArray(res.body.todos)).toBe(true);
+        expect(res.body.todos.length).toBeGreaterThan(0);
 
         done();
       })
@@ -32,6 +43,32 @@ describe("Todos", function() {
       })
     });
   });
+
+  describe("GET /todos/:id", () => {
+    beforeEach((done) => {
+      TodosModel.create(testTodosHelper.newTodoItem).then((todo) => {
+        this.todo = todo;
+        done();
+      })
+    })
+
+    it("should get exists todo", (done) => {
+      const todo = this.todo;
+
+      request.get(`/todos/${todo._id}`)
+        .then(res => {
+
+          expect(res.status).toBe(200);
+          expect(res.body.todo).toBeDefined();
+          expect(res.body.todo.title).toBe(todo.title);
+          expect(res.body.todo.description).toBe(todo.description);
+          expect(res.body.todo.status).toBe(todo.status);
+
+          done();
+        });
+    });
+  });
+
 
   describe("POST /todos", () => {
     it("should create new todo item", (done) => {
@@ -89,6 +126,32 @@ describe("Todos", function() {
           expect(res2.body.todo.title).toBe(upData.title);
           expect(res2.body.todo.description).toBe(upData.description);
           expect(res2.body.todo.status).toBe(upData.status);
+          done();
+        })
+    });
+  });
+
+  describe("DELETE /todos/:id", () => {
+    beforeEach((done) => {
+      TodosModel.create(testTodosHelper.newTodoItem).then((todo) => {
+        this.todo = todo;
+        done();
+      })
+    })
+
+    it("should update exists todo", (done) => {
+      const todo = this.todo;
+
+      request.delete(`/todos/${todo._id}`)
+        .then(res => {
+
+          expect(res.status).toBe(200);
+
+          return request.get(`/todos/${todo._id}`)
+        })
+        .then(res2 => {
+          expect(res2.status).toBe(404);
+          expect(res2.body.error).toBe('Not Found');
           done();
         })
     });

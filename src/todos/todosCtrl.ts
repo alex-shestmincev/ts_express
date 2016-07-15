@@ -75,7 +75,7 @@ export class TodosCtrl {
 
   static async Delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id: string = req.query.id;
+      const id: string = req.params.id;
       const task: ITodos = await TodosModel.findById(id).exec();
 
       await task.remove();

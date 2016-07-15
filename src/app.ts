@@ -5,6 +5,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as path from "path";
 import { routes } from './routes';
+import { HttpError, IError } from './libs/errors';
 
 /**
  * The server.
@@ -51,23 +52,19 @@ class Server {
 
     // catch 404 and forward to error handler
     this.app.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
-      console.log('Not Found');
-      var error = new Error("Not Found");
-      err.status = 404;
-      next(err);
+      next(new HttpError(404, "Not Found"));
     });
 
     // Error handler
     this.app.use(function(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
-
       if (!err.code || err.code >= 500) {
         console.error(err);
         res.status(400);
         res.json({ error: 'Uncatched error' });
         return;
       }
-      res.writeHead(err.code, err.message, {'content-type' : 'text/plain'});
-      res.end(err.message);
+      res.status(err.code);
+      res.json({error: err.message});
     });
   }
 }
